@@ -1,0 +1,8 @@
+---
+- hosts: tests
+  roles:
+    - role: iptables
+      iptables__action: setup
+
+    - role: iptables
+      iptables__action: unset

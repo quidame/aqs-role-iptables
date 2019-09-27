@@ -1,0 +1,7 @@
+# role: iptables
+# file: tests/requirements.yml
+---
+- name: "iptables"
+  src: "https://github.com/quidame/aqs-role-iptables.git"
+  scm: "git"
+  version: "devel"
