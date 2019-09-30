@@ -1,11 +1,11 @@
 ---
 # role: iptables
-# file: tasks/setup.yml
+# file: tasks/reset.yml
 #
-# Tasks to setup iptables.
+# Tasks to reset iptables.
 # Each task should be clearly named, with no inventory variable in the name.
 
 
 - import_tasks: "iptables.yml"
   vars:
-    iptables__state: present
+    iptables__rules: "{{ iptables__ruleset_reset }}"

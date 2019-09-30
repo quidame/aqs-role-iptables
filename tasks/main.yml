@@ -1,7 +1,9 @@
 ---
 # role: iptables
 # file: tasks/main.yml
+#
+# Tasks to reset iptables.
+# Each task should be clearly named, with no inventory variable in the name.
 
-- include_tasks: "{{ iptables__action | default('setup') }}.yml"
-  tags:
-    - "aqs::iptables"
+
+- import_tasks: "{{ iptables__action }}.yml"

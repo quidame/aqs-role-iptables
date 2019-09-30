@@ -14,6 +14,7 @@
 # iptables__login: admin
 # iptables__base_url: https://iptables.qssdk.lab
 
+
 ################################################################################
 ## iptables__action
 #
@@ -22,4 +23,68 @@
 # uninstall, configure/unconfigure, start/stop, present/absent, create/remove,
 # and so on.
 #
-#iptables__action: setup
+iptables__action: setup
+#iptables__action: rules (the same)
+#
+#iptables__action: unset
+#iptables__action: flush (the same)
+
+
+################################################################################
+## iptables__rules
+#
+# A list of dictionnaries describing iptables (netfilter) rules and matching
+# iptables (ansible module) parameters.
+#
+# This example builds a firewall from scratch for a DNS/DHCP/TFTP and also NTP
+# server:
+#iptables__rules:
+#  - { chain: "INPUT", policy: "ACCEPT" }
+#  - { chain: "OUTPUT", policy: "ACCEPT" }
+#  - { chain: "FORWARD", policy: "DROP" }
+#  - { flush: true }
+#  - { chain: "INPUT", ctstate: "INVALID", jump: "DROP" }
+#  - { chain: "INPUT", ctstate: "RELATED,ESTABLISHED", jump: "ACCEPT" }
+#  - { chain: "INPUT", in_interface: "lo", jump: "ACCEPT" }
+#  - { chain: "INPUT", protocol: "icmp", jump: "ACCEPT" }
+#  - { chain: "INPUT", protocol: "udp", source_port: "68", destination_port: "67", comment: "DHCP", jump: "ACCEPT" }
+#  - { chain: "INPUT", protocol: "udp", source_port: "0:1023", comment: "bad source port", jump: "DROP" }
+#  - { chain: "INPUT", protocol: "tcp", source_port: "0:1023", comment: "bad source port", jump: "DROP" }
+#  - { chain: "INPUT", protocol: "tcp", syn: "negate", ctstate: "NEW", comment: "bad NEWs", jump: "DROP" }
+#  - { chain: "INPUT", protocol: "tcp", destination_port: "22", comment: "SSH", jump: "ACCEPT" }
+#  - { chain: "INPUT", protocol: "udp", destination_port: "53", comment: "DNS", jump: "ACCEPT" }
+#  - { chain: "INPUT", protocol: "udp", destination_port: "69", comment: "TFTP", jump: "ACCEPT" }
+#  - { chain: "INPUT", protocol: "udp", destination_port: "123", comment: "NTP", jump: "ACCEPT" }
+#  - { chain: "INPUT", policy: "DROP" }
+#  - { chain: "OUTPUT", ctstate: "INVALID", jump: "DROP" }
+#  - { chain: "OUTPUT", ctstate: "RELATED,ESTABLISHED", jump: "ACCEPT" }
+#
+iptables__rules: []
+
+
+################################################################################
+## iptables__ruleset_*
+#
+# Lists of rulesets with same format than iptables__rules.
+#
+iptables__ruleset_flush:
+  - { chain: "INPUT", policy: "ACCEPT" }
+  - { chain: "OUTPUT", policy: "ACCEPT" }
+  - { chain: "FORWARD", policy: "ACCEPT" }
+  - { flush: true }
+
+iptables__ruleset_basic:
+  - { chain: "OUTPUT", ctstate: "INVALID", jump: "DROP" }
+  - { chain: "OUTPUT", ctstate: "RELATED,ESTABLISHED", jump: "ACCEPT" }
+  - { chain: "INPUT", ctstate: "INVALID", jump: "DROP" }
+  - { chain: "INPUT", ctstate: "RELATED,ESTABLISHED", jump: "ACCEPT" }
+  - { chain: "INPUT", in_interface: "lo", jump: "ACCEPT" }
+  - { chain: "INPUT", protocol: "icmp", jump: "ACCEPT" }
+  - { chain: "INPUT", protocol: "udp", source_port: "0:1023", comment: "bad source port", jump: "DROP" }
+  - { chain: "INPUT", protocol: "tcp", source_port: "0:1023", comment: "bad source port", jump: "DROP" }
+  - { chain: "INPUT", protocol: "tcp", syn: "negate", ctstate: "NEW", comment: "bad NEWs", jump: "DROP" }
+  - { chain: "INPUT", protocol: "tcp", destination_port: "{{ ansible_ssh_port | default(22) }}", comment: "SSH", jump: "ACCEPT" }
+  - { chain: "INPUT", policy: "DROP" }
+  - { chain: "FORWARD", policy: "DROP" }
+
+iptables__ruleset_reset: "{{ iptables__ruleset_flush + iptables__ruleset_basic }}"

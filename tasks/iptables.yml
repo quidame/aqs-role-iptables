@@ -1,0 +1,48 @@
+---
+# role: iptables
+# file: tasks/iptables.yml
+#
+# Task to play iptables module in a loop.
+# Each task should be clearly named, with no inventory variable in the name.
+
+
+- name: "setup firewall"
+  iptables:
+    action:              "{{ rule.action              | default(omit) }}"
+    chain:               "{{ rule.chain               | default(omit) }}"
+    comment:             "{{ rule.comment             | default(omit) }}"
+    ctstate:             "{{ rule.ctstate             | default(omit) }}"
+    destination:         "{{ rule.destination         | default(omit) }}"
+    destination_port:    "{{ rule.destination_port    | default(omit) }}"
+    flush:               "{{ rule.flush               | default(omit) }}"
+    fragment:            "{{ rule.fragment            | default(omit) }}"
+    goto:                "{{ rule.goto                | default(omit) }}"
+    icmp_type:           "{{ rule.icmp_type           | default(omit) }}"
+    in_interface:        "{{ rule.in_interface        | default(omit) }}"
+    ip_version:          "{{ rule.ip_version          | default(omit) }}"
+    jump:                "{{ rule.jump                | default(omit) }}"
+    limit:               "{{ rule.limit               | default(omit) }}"
+    limit_burst:         "{{ rule.limit_burst         | default(omit) }}"
+    log_prefix:          "{{ rule.log_prefix          | default(omit) }}"
+    match:               "{{ rule.match               | default(omit) }}"
+    out_interface:       "{{ rule.out_interface       | default(omit) }}"
+    policy:              "{{ rule.policy              | default(omit) }}"
+    protocol:            "{{ rule.protocol            | default(omit) }}"
+    reject_with:         "{{ rule.reject_with         | default(omit) }}"
+    rule_num:            "{{ rule.rule_num            | default(omit) }}"
+    set_counters:        "{{ rule.set_counters        | default(omit) }}"
+    set_dscp_mark:       "{{ rule.set_dscp_mark       | default(omit) }}"
+    set_dscp_mark_class: "{{ rule.set_dscp_mark_class | default(omit) }}"
+    source:              "{{ rule.source              | default(omit) }}"
+    source_port:         "{{ rule.source_port         | default(omit) }}"
+    syn:                 "{{ rule.syn                 | default(omit) }}"
+    table:               "{{ rule.table               | default(omit) }}"
+    tcp_flags:           "{{ rule.tcp_flags           | default(omit) }}"
+    to_detination:       "{{ rule.to_destination      | default(omit) }}"
+    to_ports:            "{{ rule.to_ports            | default(omit) }}"
+    to_source:           "{{ rule.to_source           | default(omit) }}"
+    uid_owner:           "{{ rule.uid_owner           | default(omit) }}"
+    state: "{{ rule.state | default(iptables__state   | default(omit)) }}"
+  loop: "{{ iptables__rules }}"
+  loop_control:
+    loop_var: rule

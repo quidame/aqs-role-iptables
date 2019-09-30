@@ -1,0 +1,23 @@
+---
+# role: iptables
+# file: tasks/flush.yml
+#
+# Task to play iptables module in a loop.
+# Each task should be clearly named, with no inventory variable in the name.
+
+
+# This is a basic/common flush, that only applies to the filter table. Note
+# that flushing iptables rules only blanks the rules, not the policies, so
+# they MUST be set to 'ACCEPT' BEFORE the flush (especially the INPUT chain).
+- name: "flush firewall"
+  iptables:
+    chain:  "{{ rule.chain  | default(omit) }}"
+    policy: "{{ rule.policy | default(omit) }}"
+    flush:  "{{ rule.flush  | default(omit) }}"
+  loop:
+    - { chain: "INPUT",   policy: "ACCEPT" }
+    - { chain: "FORWARD", policy: "ACCEPT" }
+    - { chain: "OUTPUT",  policy: "ACCEPT" }
+    - { flush: true }
+  loop_control:
+    loop_var: rule

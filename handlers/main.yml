@@ -7,9 +7,9 @@
 # anytime with:
 # - meta: flush_handlers.
 #
-#- name: restart iptables service
+#- name: restart netfilter-persistent service
 #  systemd:
-#    name: iptables
+#    name: netfilter-persistent
 #    daemon_reload: yes
 #    enabled: yes
 #    state: restarted

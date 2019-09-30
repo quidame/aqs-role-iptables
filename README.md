@@ -7,21 +7,38 @@ This role is a piece of (*yet another*)
 
 ## Requirements
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+None.
 
 ## Role Variables
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
-
 The main action the role is called for. Choices are `setup` (the default) and
-`unset`.
+`unset`, that may apply to the same `iptables__rules`, as setup means the listed
+rules are present, and unset means they are absent. Other valid choices are:
+`flush` and `reset`.
 ```yaml
 iptables__action: unset
 ```
 
+This variable defines a ruleset to apply in a loop within a single task:
+```yaml
+iptables__rules:
+  - chain: FORWARD
+    policy: DROP
+  - chain: INPUT
+    action: insert
+    rule_num: 5
+    protocol: tcp
+    match: tcp
+    syn: negate
+    ctstate: NEW
+    comment: "bad NEWs"
+    jump: DROP
+```
+
+
 ## Dependencies
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+None.
 
 ## Installation
 
@@ -42,21 +59,27 @@ ansible-galaxy install -r requirements.yml
 
 ## Example Playbook
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
-Setup servers:
+Setup a basic firewall from scratch:
 ```yaml
 - hosts: servers
   roles:
     - role: iptables
-```
-
-Unset servers:
-```yaml
-- hosts: servers
-  roles:
-    - role: iptables
-      iptables__action: unset
+      iptables__rules:
+        - { chain: "OUTPUT", policy: "ACCEPT" }
+        - { chain: "INPUT", policy: "ACCEPT" }
+        - { chain: "FORWARD", policy: "DROP" }
+        - { flush: true }
+        - { chain: "OUTPUT", ctstate: "INVALID", jump: "DROP" }
+        - { chain: "OUTPUT", ctstate: "RELATED,ESTABLISHED", jump: "ACCEPT" }
+        - { chain: "INPUT", ctstate: "INVALID", jump: "DROP" }
+        - { chain: "INPUT", ctstate: "RELATED,ESTABLISHED", jump: "ACCEPT" }
+        - { chain: "INPUT", in_interface: "lo", jump: "ACCEPT" }
+        - { chain: "INPUT", protocol: "icmp", jump: "ACCEPT" }
+        - { chain: "INPUT", protocol: "udp", match: "udp", source_port: "0:1023", comment: "bad source port", jump: "DROP" }
+        - { chain: "INPUT", protocol: "tcp", match: "tcp", source_port: "0:1023", comment: "bad source port", jump: "DROP" }
+        - { chain: "INPUT", protocol: "tcp", match: "tcp", syn: "negate", ctstate: "NEW", comment: "bad NEWs", jump: "DROP" }
+        - { chain: "INPUT", protocol: "tcp", match: "tcp", destination_port: "{{ ansible_ssh_port | default(22) }}", comment: "SSH", jump: "ACCEPT" }
+        - { chain: "INPUT", policy: "DROP" }
 ```
 
 ## License
