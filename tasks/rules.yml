@@ -1,0 +1,13 @@
+---
+# role: iptables
+# file: tasks/rules.yml
+#
+# Tasks to setup iptables.
+# Each task should be clearly named, with no inventory variable in the name.
+
+
+# This differs from setup and unset tasks as it doesn't force 'state' value
+# for all rules. So it is possible to mix appending and deleting subtasks
+# (iterations), making the firewall easier to update by adding new rules and
+# removing old ones.
+- import_tasks: "iptables.yml"

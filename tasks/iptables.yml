@@ -5,6 +5,12 @@
 # Task to play iptables module in a loop.
 # Each task should be clearly named, with no inventory variable in the name.
 
+# Display the data structure of the main variable
+- name: display iptables__rules
+  debug:
+    var: iptables__rules
+    verbosity: 2
+
 
 - name: "setup firewall"
   iptables:
@@ -42,7 +48,7 @@
     to_ports:            "{{ rule.to_ports            | default(omit) }}"
     to_source:           "{{ rule.to_source           | default(omit) }}"
     uid_owner:           "{{ rule.uid_owner           | default(omit) }}"
-    state: "{{ rule.state | default(iptables__state   | default(omit)) }}"
+    state: "{{ iptables__state | default(rule.state   | default(omit)) }}"
   loop: "{{ iptables__rules }}"
   loop_control:
     loop_var: rule
