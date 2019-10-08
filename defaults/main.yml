@@ -24,10 +24,9 @@
 # and so on.
 #
 iptables__action: setup
-#iptables__action: rules (the same)
-#
+#iptables__action: rules
 #iptables__action: unset
-#iptables__action: flush (the same)
+#iptables__action: flush
 
 
 ################################################################################
