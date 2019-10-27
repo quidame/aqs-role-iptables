@@ -61,9 +61,11 @@ ansible-galaxy install -r requirements.yml
 
 Setup a basic firewall from scratch:
 ```yaml
+---
 - hosts: servers
   roles:
     - role: iptables
+      iptables__action: setup
       iptables__rules:
         - { chain: "OUTPUT", policy: "ACCEPT" }
         - { chain: "INPUT", policy: "ACCEPT" }
@@ -78,8 +80,22 @@ Setup a basic firewall from scratch:
         - { chain: "INPUT", protocol: "udp", match: "udp", source_port: "0:1023", comment: "bad source port", jump: "DROP" }
         - { chain: "INPUT", protocol: "tcp", match: "tcp", source_port: "0:1023", comment: "bad source port", jump: "DROP" }
         - { chain: "INPUT", protocol: "tcp", match: "tcp", syn: "negate", ctstate: "NEW", comment: "bad NEWs", jump: "DROP" }
-        - { chain: "INPUT", protocol: "tcp", match: "tcp", destination_port: "{{ ansible_ssh_port | default(22) }}", comment: "SSH", jump: "ACCEPT" }
+        - chain: "INPUT"
+          protocol: "tcp"
+          match: "tcp"
+          destination_port: "{{ ansible_ssh_port | default(22) }}"
+          comment: "SSH"
+          jump: "ACCEPT"
         - { chain: "INPUT", policy: "DROP" }
+```
+
+Flush rules:
+```yaml
+---
+- hosts: servers
+  roles:
+    - role: iptables
+      iptables__action: flush
 ```
 
 ## License
